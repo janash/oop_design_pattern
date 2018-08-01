@@ -4,6 +4,14 @@
 # library to import to make classes abstract
 import abc
 
+# Python 2/3 compatibility
+import sys
+
+if sys.version_info >= (3, 4):
+    ABC = abc.ABC
+else:
+    ABC = abc.ABCMeta('ABC', (). {})
+
 class AbstractOrder(abc.ABC):
 
     def __init__(self, name):
@@ -21,6 +29,7 @@ class Order(AbstractOrder):
 
     # class attribute
     _in_stock = 10
+    __private = 1
 
     def __init__(self, num_items=0, name=None):
 
@@ -57,6 +66,25 @@ class StoreOrder(Order):
         return "In store ordered {} items.".format(self.num_items)
 
 
+order1 = Order(3, 'Sarah')
+order2 = StoreOrder(2)
+
+for order in (order1, order2):
+    print(order.order_details())
+
+print(order1.static_method(), 'preferred:', Order.static_method()) # first works in Python only, second is how you would do it in C++,Java
+
+print(order2.class_method, 'preferred:', Order.class_method())
+
+print(order1.hello_from_parent())
+
+print("You shouldn't do this ", Order._in_stock) # You should not do this
+
+# __ are actually protected - you cant access these.
+try:
+    print(Order.__private)
+except Exception as err:
+    print(err)
 
 try:
     order = AbstractOrder()
